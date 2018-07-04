@@ -2,8 +2,8 @@
 //  ViewController.swift
 //  MapBox
 //
-//  Created by Fabio Salvo on 03/07/2018.
-//  Copyright © 2018 Fabio Salvo. All rights reserved.
+//  Created by Grazia Chillè on 03/07/2018.
+//  Copyright © 2018 Grazia Chillè. All rights reserved.
 //
 
 import UIKit
@@ -11,6 +11,11 @@ import MapKit
 
 class ViewController: UIViewController, MKMapViewDelegate, UISearchBarDelegate {
     
+    @IBOutlet weak var lunghezzaLatoOutlet: UITextField!
+    @IBOutlet weak var latitudineNordOutlet: UITextField!
+    @IBOutlet weak var latitudineSudOutlet: UITextField!
+    @IBOutlet weak var longitudineOvestOutlet: UITextField!
+    @IBOutlet weak var longitudineEstOutlet: UITextField!
     @IBOutlet weak var searchBlur: UIVisualEffectView!
     
     @IBAction func changeMapView(_ sender: UISegmentedControl) {
@@ -23,14 +28,13 @@ class ViewController: UIViewController, MKMapViewDelegate, UISearchBarDelegate {
             myMapView.mapType = .hybrid
         }
     }
-    @IBOutlet weak var calcolaButton: UIButton!
+
     @IBOutlet weak var myMapView: MKMapView!
     @IBOutlet weak var visualizzButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        calcolaButton.layer.cornerRadius = 10
-        calcolaButton.layer.masksToBounds = true
+       
         visualizzButton.layer.cornerRadius = 10
         visualizzButton.layer.masksToBounds = true
         searchBlur.layer.cornerRadius = 20
@@ -46,25 +50,57 @@ class ViewController: UIViewController, MKMapViewDelegate, UISearchBarDelegate {
     //Disegno il poligono
     func disegnaBox()
     {
-        var points=[CLLocationCoordinate2DMake(41.1290213, -74.5422363),CLLocationCoordinate2DMake(40.1788733, -74.5202637 ),CLLocationCoordinate2DMake(40.1704789, -72.8558350),CLLocationCoordinate2DMake( 41.1455697, -72.8778076),CLLocationCoordinate2DMake(41.1290213, -74.5422363) ]
-    
+        var latitudineNord = (latitudineNordOutlet.text as! NSString).doubleValue
+        var longitudineOvest = (longitudineOvestOutlet.text as! NSString).doubleValue
+        var latitudineSud = (latitudineSudOutlet.text as! NSString).doubleValue
+        var longitudineEst = (longitudineEstOutlet.text as! NSString).doubleValue
+        
+        //Creo l'annotazione
+        var annotation = MKPointAnnotation()
+        annotation.title = "P1"
+        annotation.coordinate = CLLocationCoordinate2DMake(latitudineNord, longitudineEst)
+        var annotation1 = MKPointAnnotation()
+        annotation1.title = "P2"
+        annotation1.coordinate = CLLocationCoordinate2DMake(latitudineSud, longitudineEst)
+        var annotation2 = MKPointAnnotation()
+        annotation2.title = "P3"
+        annotation2.coordinate = CLLocationCoordinate2DMake(latitudineSud, longitudineOvest)
+        var annotation3 = MKPointAnnotation()
+        annotation3.title = "P4"
+        annotation3.coordinate = CLLocationCoordinate2DMake(latitudineNord, longitudineOvest)
+        
+        //Zoom
+        let coordinate: CLLocationCoordinate2D = CLLocationCoordinate2DMake(latitudineNord, longitudineOvest)
+        let span = MKCoordinateSpanMake(0.1, 0.1)
+        let region = MKCoordinateRegionMake(coordinate, span)
+        myMapView.setRegion(region, animated: true)
+       
+        var points = [CLLocationCoordinate2DMake(latitudineNord, longitudineEst),CLLocationCoordinate2DMake(latitudineSud, longitudineEst ),CLLocationCoordinate2DMake(latitudineSud, longitudineOvest),CLLocationCoordinate2DMake( latitudineNord, longitudineOvest),CLLocationCoordinate2DMake(latitudineNord, longitudineEst)]
+        
         let polygon = MKPolygon(coordinates: &points, count: points.count)
         
         myMapView.add(polygon)
+        myMapView.addAnnotation(annotation)
+        myMapView.addAnnotation(annotation1)
+        myMapView.addAnnotation(annotation2)
+        myMapView.addAnnotation(annotation3)
+        
     }
     
+    
     //Personalizzo il poligono
-    func mapView(_ mapView: MKMapView!, rendererFor overlay: MKOverlay!) -> MKOverlayRenderer! {
+    func mapView(_ mapView: MKMapView!, rendererFor overlay: MKOverlay!) -> MKOverlayRenderer!  {
         if overlay is MKPolygon {
             let polygonView = MKPolygonRenderer(overlay: overlay)
             polygonView.fillColor = UIColor.red
             polygonView.alpha = 0.5
-            polygonView.strokeColor = UIColor.red
             return polygonView
         }
-        
-        return nil
+        return  nil
     }
+    
+    
+    
 
 var flag = false
     
